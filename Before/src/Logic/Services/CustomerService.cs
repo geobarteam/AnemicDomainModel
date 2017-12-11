@@ -13,17 +13,17 @@ namespace Logic.Services
             _movieService = movieService;
         }
 
-        private decimal CalculatePrice(CustomerStatus status, DateTime? statusExpirationDate, LicensingModel licensingModel)
+        private Euros CalculatePrice(CustomerStatus status, DateTime? statusExpirationDate, LicensingModel licensingModel)
         {
-            decimal price;
+            Euros price;
             switch (licensingModel)
             {
                 case LicensingModel.TwoDays:
-                    price = 4;
+                    price = Euros.Of(4);
                     break;
 
                 case LicensingModel.LifeLong:
-                    price = 8;
+                    price = Euros.Of(8);
                     break;
 
                 default:
@@ -52,7 +52,7 @@ namespace Logic.Services
             };
 
             customer.PurchasedMovies.Add(purchasedMovie);
-            customer.MoneySpent += price;
+            customer.MoneySpent += Euros.Of(price);
         }
 
         public bool PromoteCustomer(Customer customer)

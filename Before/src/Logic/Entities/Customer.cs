@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Remoting.Messaging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -9,7 +10,6 @@ namespace Logic.Entities
     public class Customer : Entity
     {
         private string _name;
-
         public virtual CustomerName Name
         {
             get => (CustomerName)this._name;
@@ -28,7 +28,13 @@ namespace Logic.Entities
 
         public virtual DateTime? StatusExpirationDate { get; set; }
 
-        public virtual decimal MoneySpent { get; set; }
+        private decimal _moneySpent;
+
+        public virtual Euros MoneySpent
+        {
+            get => (Euros)this._moneySpent;
+            set => this._moneySpent = value;
+        }
 
         public virtual IList<PurchasedMovie> PurchasedMovies { get; set; }
     }
