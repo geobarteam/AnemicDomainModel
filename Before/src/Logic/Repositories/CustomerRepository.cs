@@ -23,7 +23,7 @@ namespace Logic.Repositories
         {
             return _unitOfWork
                 .Query<Customer>()
-                .SingleOrDefault(x => x.Email == email);
+                .SingleOrDefault(x => x.Email.Value == email);
         }
     }
 }

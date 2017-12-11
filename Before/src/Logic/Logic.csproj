@@ -53,12 +53,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dtos\CreateCustomerDto.cs" />
     <Compile Include="Dtos\CustomerDto.cs" />
     <Compile Include="Dtos\CustomerInListDto.cs" />
     <Compile Include="Dtos\MovieDto.cs" />
     <Compile Include="Dtos\PurchasedMovieDto.cs" />
+    <Compile Include="Dtos\UpdateCustomerDto.cs" />
     <Compile Include="Entities\Customer.cs" />
+    <Compile Include="Entities\CustomerName.cs" />
     <Compile Include="Entities\CustomerStatus.cs" />
+    <Compile Include="Entities\Email.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\LicensingModel.cs" />
     <Compile Include="Entities\Movie.cs" />
@@ -74,6 +78,7 @@
     <Compile Include="Services\MovieService.cs" />
     <Compile Include="Utils\SessionFactory.cs" />
     <Compile Include="Utils\UnitOfWork.cs" />
+    <Compile Include="Utils\ValueObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

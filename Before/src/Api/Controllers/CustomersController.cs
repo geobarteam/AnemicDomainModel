@@ -36,7 +36,7 @@ namespace Api.Controllers
             var dto = new CustomerDto
             {
                 Id = customer.Id,
-                Email = customer.Email,
+                Email = customer.Email.Value,
                 MoneySpent = customer.MoneySpent,
                 Status = customer.Status.ToString(),
                 StatusExpirationDate = customer.StatusExpirationDate,
@@ -61,19 +61,19 @@ namespace Api.Controllers
             IReadOnlyList<Customer> customers = _customerRepository.GetList();
             List<CustomerInListDto> dto = customers.Select(n => new CustomerInListDto
             {
-                Email = n.Email,
+                Email = n.Email.Value,
                 Id = n.Id,
                 MoneySpent = n.MoneySpent,
                 StatusExpirationDate = n.StatusExpirationDate,
                 Status = n.Status.ToString(),
-                Name = n.Name
+                Name = n.Name.Value
             }).ToList();
 
             return Json(dto);
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] Customer item)
+        public IActionResult Create([FromBody] CreateCustomerDto item)
         {
             try
             {
@@ -87,9 +87,16 @@ namespace Api.Controllers
                     return BadRequest("Email is already in use: " + item.Email);
                 }
 
-                item.Id = 0;
-                item.Status = CustomerStatus.Regular;
-                _customerRepository.Add(item);
+                var customer = new Customer
+                {
+                    Name = new CustomerName(item.Name),
+                    Email = new Email(item.Email),
+                    MoneySpent = 0,
+                    Status = CustomerStatus.Regular,
+                    StatusExpirationDate = null
+                };
+
+                _customerRepository.Add(customer);
                 _customerRepository.SaveChanges();
 
                 return Ok();
@@ -102,7 +109,7 @@ namespace Api.Controllers
 
         [HttpPut]
         [Route("{id}")]
-        public IActionResult Update(long id, [FromBody] Customer item)
+        public IActionResult Update(long id, [FromBody] UpdateCustomerDto item)
         {
             try
             {
@@ -117,7 +124,7 @@ namespace Api.Controllers
                     return BadRequest("Invalid customer id: " + id);
                 }
 
-                customer.Name = item.Name;
+                customer.Name = new CustomerName(item.Name);
                 _customerRepository.SaveChanges();
 
                 return Ok();
