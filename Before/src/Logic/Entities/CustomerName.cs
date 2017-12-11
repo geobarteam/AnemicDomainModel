@@ -42,5 +42,15 @@ namespace Logic.Entities
         {
             return Value.GetHashCode();
         }
+
+        public static implicit operator string(CustomerName customerName)
+        {
+            return customerName.Value;
+        }
+
+        public static implicit operator CustomerName(string customerName)
+        {
+            return Create(customerName).Value;
+        }
     }
 }

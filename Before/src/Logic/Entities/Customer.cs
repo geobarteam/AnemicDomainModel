@@ -12,16 +12,16 @@ namespace Logic.Entities
 
         public virtual CustomerName Name
         {
-            get => CustomerName.Create(_name).Value;
-            set => _name = value.Value;
+            get => (CustomerName)this._name;
+            set => _name = value;
         }
 
         private string _email;
 
         public virtual Email Email
         {
-            get => Email.Create(_email).Value;
-            set => _email = value.Value;
+            get => (Email)this._email;
+            set => _email = value;
         }
 
         public virtual CustomerStatus Status { get; set; }
