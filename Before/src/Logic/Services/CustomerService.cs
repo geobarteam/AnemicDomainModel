@@ -13,7 +13,7 @@ namespace Logic.Services
             _movieService = movieService;
         }
 
-        private Euros CalculatePrice(CustomerStatus status, DateTime? statusExpirationDate, LicensingModel licensingModel)
+        private Euros CalculatePrice(CustomerStatus status, ExpirationDate statusExpirationDate, LicensingModel licensingModel)
         {
             Euros price;
             switch (licensingModel)
@@ -30,7 +30,7 @@ namespace Logic.Services
                     throw new ArgumentOutOfRangeException();
             }
 
-            if (status == CustomerStatus.Advanced && (statusExpirationDate == null || statusExpirationDate.Value >= DateTime.UtcNow))
+            if (status == CustomerStatus.Advanced && !statusExpirationDate.IsExpired)
             {
                 price = price * 0.75m;
             }
@@ -40,7 +40,7 @@ namespace Logic.Services
 
         public void PurchaseMovie(Customer customer, Movie movie)
         {
-            DateTime? expirationDate = _movieService.GetExpirationDate(movie.LicensingModel);
+            var expirationDate = _movieService.GetExpirationDate(movie.LicensingModel);
             decimal price = CalculatePrice(customer.Status, customer.StatusExpirationDate, movie.LicensingModel);
 
             var purchasedMovie = new PurchasedMovie
@@ -48,7 +48,8 @@ namespace Logic.Services
                 MovieId = movie.Id,
                 CustomerId = customer.Id,
                 ExpirationDate = expirationDate,
-                Price = price
+                Price = Euros.Of(price),
+                PurchaseDate = DateTime.UtcNow
             };
 
             customer.PurchasedMovies.Add(purchasedMovie);
@@ -58,7 +59,7 @@ namespace Logic.Services
         public bool PromoteCustomer(Customer customer)
         {
             // at least 2 active movies during the last 30 days
-            if (customer.PurchasedMovies.Count(x => x.ExpirationDate == null || x.ExpirationDate.Value >= DateTime.UtcNow.AddDays(-30)) < 2)
+            if (customer.PurchasedMovies.Count(x => x.ExpirationDate == ExpirationDate.Infinite || x.ExpirationDate.Date >= DateTime.UtcNow.AddDays(-30)) < 2)
                 return false;
 
             // at least 100 dollars spent during the last year
@@ -66,7 +67,7 @@ namespace Logic.Services
                 return false;
 
             customer.Status = CustomerStatus.Advanced;
-            customer.StatusExpirationDate = DateTime.UtcNow.AddYears(1);
+            customer.StatusExpirationDate = (ExpirationDate)DateTime.UtcNow.AddYears(1);
 
             return true;
         }

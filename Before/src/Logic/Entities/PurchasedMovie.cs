@@ -11,10 +11,22 @@ namespace Logic.Entities
 
         public virtual long CustomerId { get; set; }
 
-        public virtual decimal Price { get; set; }
+        private decimal _price;
+
+        public virtual Euros Price
+        {
+            get => (Euros)this._price;
+            set => this._price = value;
+        }
 
         public virtual DateTime PurchaseDate { get; set; }
 
-        public virtual DateTime? ExpirationDate { get; set; }
+        private DateTime? _expirationDate;
+
+        public virtual ExpirationDate ExpirationDate
+        {
+            get => (ExpirationDate)this._expirationDate;
+            set => this._expirationDate = value;
+        }
     }
 }

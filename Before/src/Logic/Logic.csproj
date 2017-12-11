@@ -65,6 +65,7 @@
     <Compile Include="Entities\Email.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\Euros.cs" />
+    <Compile Include="Entities\ExpirationDate.cs" />
     <Compile Include="Entities\LicensingModel.cs" />
     <Compile Include="Entities\Movie.cs" />
     <Compile Include="Entities\PurchasedMovie.cs" />

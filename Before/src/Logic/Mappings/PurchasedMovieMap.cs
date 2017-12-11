@@ -1,3 +1,4 @@
+using System;
 using FluentNHibernate.Mapping;
 using Logic.Entities;
 
@@ -9,9 +10,9 @@ namespace Logic.Mappings
         {
             Id(x => x.Id);
 
-            Map(x => x.Price);
+            Map(x => x.Price).CustomType<DateTime?>().Access.CamelCaseField(Prefix.Underscore); 
             Map(x => x.PurchaseDate);
-            Map(x => x.ExpirationDate).Nullable();
+            Map(x => x.ExpirationDate).CustomType<DateTime?>().Access.CamelCaseField(Prefix.Underscore);
             Map(x => x.MovieId);
             Map(x => x.CustomerId);
 
