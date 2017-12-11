@@ -88,6 +88,11 @@ namespace Api.Controllers
                     return BadRequest(result.Error);
                 }
 
+                if (_customerRepository.GetByEmail(emailOrError.Value) != null)
+                {
+                    return BadRequest("Email is allready in use:" + emailOrError.Value);
+                }
+
                 var customer = new Customer
                 {
                     Name = customerNameOrError.Value,
