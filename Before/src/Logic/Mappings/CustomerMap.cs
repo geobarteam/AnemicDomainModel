@@ -9,8 +9,8 @@ namespace Logic.Mappings
         {
             Id(x => x.Id);
 
-            Map(x => x.Name);
-            Map(x => x.Email);
+            Map(x => x.Name).CustomType<string>().Access.CamelCaseField(Prefix.Underscore);
+            Map(x => x.Email).CustomType<string>().Access.CamelCaseField(Prefix.Underscore);
             Map(x => x.Status).CustomType<int>();
             Map(x => x.StatusExpirationDate).Nullable();
             Map(x => x.MoneySpent);
