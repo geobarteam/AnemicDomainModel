@@ -5,6 +5,7 @@ using Logic.Dtos;
 using Logic.Entities;
 using Logic.Repositories;
 using Logic.Services;
+using Logic.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
@@ -77,20 +78,20 @@ namespace Api.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
+                Result<CustomerName> customerNameOrError = CustomerName.Create(item.Name);
+                Result<Email> emailOrError = Email.Create(item.Email);
 
-                if (_customerRepository.GetByEmail(item.Email) != null)
+                Result result = Result.Combine(customerNameOrError, emailOrError);
+
+                if (result.IsFailure)
                 {
-                    return BadRequest("Email is already in use: " + item.Email);
+                    return BadRequest(result.Error);
                 }
 
                 var customer = new Customer
                 {
-                    Name = new CustomerName(item.Name),
-                    Email = new Email(item.Email),
+                    Name = customerNameOrError.Value,
+                    Email = emailOrError.Value,
                     MoneySpent = 0,
                     Status = CustomerStatus.Regular,
                     StatusExpirationDate = null
@@ -124,7 +125,7 @@ namespace Api.Controllers
                     return BadRequest("Invalid customer id: " + id);
                 }
 
-                customer.Name = new CustomerName(item.Name);
+                customer.Name = CustomerName.Create(item.Name).Value;
                 _customerRepository.SaveChanges();
 
                 return Ok();

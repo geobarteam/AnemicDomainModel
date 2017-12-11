@@ -76,6 +76,7 @@
     <Compile Include="Repositories\Repository.cs" />
     <Compile Include="Services\CustomerService.cs" />
     <Compile Include="Services\MovieService.cs" />
+    <Compile Include="Utils\Result.cs" />
     <Compile Include="Utils\SessionFactory.cs" />
     <Compile Include="Utils\UnitOfWork.cs" />
     <Compile Include="Utils\ValueObject.cs" />
