@@ -20,18 +20,18 @@ namespace Api.Controllers
         protected new IActionResult Ok()
         {
             this._unitOfWork.Commit();
-            return base.Ok();
+            return base.Ok(Envelope.Ok());
         }
 
         protected IActionResult Ok<T>(T result)
         {
             this._unitOfWork.Commit();
-            return base.Ok(result);
+            return base.Ok(Envelope.Ok(result));
         }
 
         protected IActionResult Error(string error)
         {
-            return BadRequest(error);
+            return BadRequest(Envelope.Error(error));
         }
     }
 }
