@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
-namespace Api.Controllers
+namespace Api
 {
     public class ExceptionHandler
     {
@@ -32,7 +30,7 @@ namespace Api.Controllers
         private Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
             // Log Exception
-            string result = JsonConvert.SerializeObject(new {error = ex.Message});
+            string result = JsonConvert.SerializeObject(Envelope.Error(ex.Message));
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             return context.Response.WriteAsync(result);
