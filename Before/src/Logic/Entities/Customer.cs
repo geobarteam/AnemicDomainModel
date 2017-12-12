@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.Remoting.Messaging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Linq;
+using Remotion.Linq.Utilities;
 
 namespace Logic.Entities
 {
@@ -42,6 +40,41 @@ namespace Logic.Entities
             set => this._moneySpent = value;
         }
 
-        public virtual IList<PurchasedMovie> PurchasedMovies { get; set; }
+        protected Customer()
+        {
+            this._purchasedMovies = new List<PurchasedMovie>();    
+        }
+
+        public Customer(CustomerName name, Email email):this()
+        {
+            this._name = name ?? throw new ArgumentEmptyException(nameof(name));
+            this._email = email ?? throw new ArgumentEmptyException(nameof(email));
+
+            this.MoneySpent = Euros.Of(0);
+            this.Status = CustomerStatus.Regular;
+            this.StatusExpirationDate = null;
+        }
+
+
+        private IList<PurchasedMovie> _purchasedMovies;
+
+        public virtual IReadOnlyList<PurchasedMovie> PurchasedMovies
+        {
+            get => this._purchasedMovies.ToList();
+        }
+
+        public virtual void AddPurchasedMovies(Movie movie, ExpirationDate expirationDate, Euros price)
+        {
+            this._moneySpent += Euros.Of(price);
+            var purchasedMovie = new PurchasedMovie
+            {
+                MovieId = movie.Id,
+                CustomerId = this.Id,
+                ExpirationDate = expirationDate,
+                Price = Euros.Of(price),
+                PurchaseDate = DateTime.UtcNow
+            };
+            this._purchasedMovies.Add(purchasedMovie);
+        }
     }
 }

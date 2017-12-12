@@ -35,25 +35,16 @@ namespace Logic.Services
                 price = price * 0.75m;
             }
 
-            return price;
+            return Euros.Of(price);
         }
 
         public void PurchaseMovie(Customer customer, Movie movie)
         {
             var expirationDate = _movieService.GetExpirationDate(movie.LicensingModel);
-            decimal price = CalculatePrice(customer.Status, customer.StatusExpirationDate, movie.LicensingModel);
-
-            var purchasedMovie = new PurchasedMovie
-            {
-                MovieId = movie.Id,
-                CustomerId = customer.Id,
-                ExpirationDate = expirationDate,
-                Price = Euros.Of(price),
-                PurchaseDate = DateTime.UtcNow
-            };
-
-            customer.PurchasedMovies.Add(purchasedMovie);
-            customer.MoneySpent += Euros.Of(price);
+            var price = CalculatePrice(customer.Status, customer.StatusExpirationDate, movie.LicensingModel);
+            
+            customer.AddPurchasedMovies(movie, expirationDate, price);
+            
         }
 
         public bool PromoteCustomer(Customer customer)
