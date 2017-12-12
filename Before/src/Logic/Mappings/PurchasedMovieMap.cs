@@ -13,10 +13,9 @@ namespace Logic.Mappings
             Map(x => x.Price).CustomType<DateTime?>().Access.CamelCaseField(Prefix.Underscore); 
             Map(x => x.PurchaseDate);
             Map(x => x.ExpirationDate).CustomType<DateTime?>().Access.CamelCaseField(Prefix.Underscore);
-            Map(x => x.MovieId);
-            Map(x => x.CustomerId);
-
-            References(x => x.Movie).LazyLoad(Laziness.False).ReadOnly();
+          
+            References(x => x.Movie);
+            References(x => x.Customer);
         }
     }
 }

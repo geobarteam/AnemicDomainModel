@@ -17,6 +17,8 @@ namespace Logic.Entities
             get => this._value;
         }
 
+        public bool IsZero => this.Value == 0;
+
         private Euros(decimal value)
         {
             this._value = value;
