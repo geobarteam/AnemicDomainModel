@@ -40,7 +40,7 @@ namespace Api.Controllers
                 Email = customer.Email.Value,
                 MoneySpent = customer.MoneySpent,
                 Status = customer.Status.ToString(),
-                StatusExpirationDate = customer.StatusExpirationDate,
+                StatusExpirationDate = customer.Status.ExpirationDate,
                 PurchasedMovies = customer.PurchasedMovies.Select(x => new PurchasedMovieDto
                 {
                     Price = x.Price,
@@ -65,7 +65,7 @@ namespace Api.Controllers
                 Email = n.Email.Value,
                 Id = n.Id,
                 MoneySpent = n.MoneySpent,
-                StatusExpirationDate = n.StatusExpirationDate,
+                StatusExpirationDate = n.Status.ExpirationDate,
                 Status = n.Status.ToString(),
                 Name = n.Name.Value
             }).ToList();
@@ -180,7 +180,7 @@ namespace Api.Controllers
                     return BadRequest("Invalid customer id: " + id);
                 }
 
-                if (customer.Status == CustomerStatus.Advanced && !customer.StatusExpirationDate.IsExpired)
+                if (customer.Status.IsAdvanced)
                 {
                     return BadRequest("The customer already has the Advanced status");
                 }

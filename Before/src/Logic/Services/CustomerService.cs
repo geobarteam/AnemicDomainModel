@@ -13,7 +13,7 @@ namespace Logic.Services
             _movieService = movieService;
         }
 
-        private Euros CalculatePrice(CustomerStatus status, ExpirationDate statusExpirationDate, LicensingModel licensingModel)
+        private Euros CalculatePrice(CustomerStatus customerStatus, LicensingModel licensingModel)
         {
             Euros price;
             switch (licensingModel)
@@ -30,7 +30,7 @@ namespace Logic.Services
                     throw new ArgumentOutOfRangeException();
             }
 
-            if (status == CustomerStatus.Advanced && !statusExpirationDate.IsExpired)
+            if (customerStatus.IsAdvanced)
             {
                 price = price * 0.75m;
             }
@@ -41,11 +41,12 @@ namespace Logic.Services
         public void PurchaseMovie(Customer customer, Movie movie)
         {
             var expirationDate = _movieService.GetExpirationDate(movie.LicensingModel);
-            var price = CalculatePrice(customer.Status, customer.StatusExpirationDate, movie.LicensingModel);
+            var price = CalculatePrice(customer.Status, movie.LicensingModel);
             
             customer.AddPurchasedMovies(movie, expirationDate, price);
             
         }
+
 
         public bool PromoteCustomer(Customer customer)
         {
@@ -57,8 +58,7 @@ namespace Logic.Services
             if (customer.PurchasedMovies.Where(x => x.PurchaseDate > DateTime.UtcNow.AddYears(-1)).Sum(x => x.Price) < 100m)
                 return false;
 
-            customer.Status = CustomerStatus.Advanced;
-            customer.StatusExpirationDate = (ExpirationDate)DateTime.UtcNow.AddYears(1);
+            customer.Status = customer.Status.Promote();
 
             return true;
         }
