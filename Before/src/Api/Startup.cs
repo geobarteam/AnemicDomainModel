@@ -1,4 +1,5 @@
-﻿using Logic.Repositories;
+﻿using Api.Controllers;
+using Logic.Repositories;
 using Logic.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -26,13 +27,9 @@ namespace Api
             services.AddTransient<CustomerRepository>();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
+            app.UseMiddleware<ExceptionHandler>();
             app.UseMvc();
         }
     }

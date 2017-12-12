@@ -22,7 +22,7 @@ namespace Logic.Entities
             protected set => _email = value;
         }
 
-        public virtual CustomerStatus Status { get; set; }
+        public virtual CustomerStatus Status { get; protected set; }
 
         private decimal _moneySpent;
 

@@ -10,12 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Controllers
 {
     [Route("api/[controller]")]
-    public class CustomersController : Controller
+    public class CustomersController : BaseController
     {
         private readonly MovieRepository _movieRepository;
         private readonly CustomerRepository _customerRepository;
 
-        public CustomersController(MovieRepository movieRepository, CustomerRepository customerRepository)
+        public CustomersController(UnitOfWork unitOfWork, MovieRepository movieRepository, CustomerRepository customerRepository)
+            : base(unitOfWork)
         {
             _customerRepository = customerRepository;
             _movieRepository = movieRepository;
@@ -50,11 +51,11 @@ namespace Api.Controllers
                 }).ToList()
             };
 
-            return Json(dto);
+            return Ok(dto);
         }
 
         [HttpGet]
-        public JsonResult GetList()
+        public IActionResult GetList()
         {
             IReadOnlyList<Customer> customers = _customerRepository.GetList();
             List<CustomerInListDto> dto = customers.Select(n => new CustomerInListDto
@@ -67,14 +68,13 @@ namespace Api.Controllers
                 Name = n.Name.Value
             }).ToList();
 
-            return Json(dto);
+            return Ok(dto);
         }
 
         [HttpPost]
         public IActionResult Create([FromBody] CreateCustomerDto item)
         {
-            try
-            {
+            
                 Result<CustomerName> customerNameOrError = CustomerName.Create(item.Name);
                 Result<Email> emailOrError = Email.Create(item.Email);
 
@@ -82,32 +82,26 @@ namespace Api.Controllers
 
                 if (result.IsFailure)
                 {
-                    return BadRequest(result.Error);
+                    return Error(result.Error);
                 }
 
                 if (_customerRepository.GetByEmail(emailOrError.Value) != null)
                 {
-                    return BadRequest("Email is allready in use:" + emailOrError.Value);
+                    return Error("Email is allready in use:" + emailOrError.Value);
                 }
 
                 var customer = new Customer(customerNameOrError.Value, emailOrError.Value);
                 _customerRepository.Add(customer);
-                _customerRepository.SaveChanges();
 
                 return Ok();
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, new { error = e.Message });
-            }
+            
         }
 
         [HttpPut]
         [Route("{id}")]
         public IActionResult Update(long id, [FromBody] UpdateCustomerDto item)
         {
-            try
-            {
+            
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
@@ -116,86 +110,67 @@ namespace Api.Controllers
                 Customer customer = _customerRepository.GetById(id);
                 if (customer == null)
                 {
-                    return BadRequest("Invalid customer id: " + id);
+                    return Error("Invalid customer id: " + id);
                 }
 
                 customer.Name = CustomerName.Create(item.Name).Value;
-                _customerRepository.SaveChanges();
 
                 return Ok();
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, new { error = e.Message });
-            }
+            
         }
 
         [HttpPost]
         [Route("{id}/movies")]
         public IActionResult PurchaseMovie(long id, [FromBody] long movieId)
         {
-            try
-            {
+            
                 Movie movie = _movieRepository.GetById(movieId);
                 if (movie == null)
                 {
-                    return BadRequest("Invalid movie id: " + movieId);
+                    return Error("Invalid movie id: " + movieId);
                 }
 
                 Customer customer = _customerRepository.GetById(id);
                 if (customer == null)
                 {
-                    return BadRequest("Invalid customer id: " + id);
+                    return Error("Invalid customer id: " + id);
                 }
 
                 if (customer.PurchasedMovies.Any(x => x.Movie.Id == movie.Id && !x.ExpirationDate.IsExpired))
                 {
-                    return BadRequest("The movie is already purchased: " + movie.Name);
+                    return Error("The movie is already purchased: " + movie.Name);
                 }
 
                 customer.PurchaseMovie(movie);
 
-                _customerRepository.SaveChanges();
-
                 return Ok();
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, new { error = e.Message });
-            }
+           
         }
 
         [HttpPost]
         [Route("{id}/promotion")]
         public IActionResult PromoteCustomer(long id)
         {
-            try
-            {
+            
                 Customer customer = _customerRepository.GetById(id);
                 if (customer == null)
                 {
-                    return BadRequest("Invalid customer id: " + id);
+                    return Error("Invalid customer id: " + id);
                 }
 
                 if (customer.Status.IsAdvanced)
                 {
-                    return BadRequest("The customer already has the Advanced status");
+                    return Error("The customer already has the Advanced status");
                 }
 
                 bool success = customer.Promote();
                 if (!success)
                 {
-                    return BadRequest("Cannot promote the customer");
+                    return Error("Cannot promote the customer");
                 }
 
-                _customerRepository.SaveChanges();
-
                 return Ok();
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, new { error = e.Message });
-            }
+            
         }
     }
 }
