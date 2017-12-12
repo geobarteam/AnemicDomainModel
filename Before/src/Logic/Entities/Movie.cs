@@ -3,58 +3,47 @@ using Newtonsoft.Json;
 
 namespace Logic.Entities
 {
-    public class Movie : Entity
+    public abstract class Movie : Entity
     {
         public virtual string Name { get; protected set; }
 
-        public virtual LicensingModel LicensingModel { get; protected set; }
-
-        protected Movie() { }
-
-        public Movie(string name, LicensingModel licensingModel)
-            : this()
-        {
-            this.Name = name;
-            this.LicensingModel = licensingModel;
-        }
+        protected virtual LicensingModel LicensingModel { get; set; }
 
         public virtual Euros CalculatePrice(CustomerStatus customerStatus)
         {
             var modifier = 1 - customerStatus.GetDiscount();
-            switch (this.LicensingModel)
-            {
-                case LicensingModel.TwoDays:
-                    return Euros.Of(4) * modifier;
-
-                case LicensingModel.LifeLong:
-                    return Euros.Of(8) * modifier;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return this.CalculatePriceCore() * modifier;
         }
 
-        public virtual ExpirationDate GetExpirationDate()
+        protected abstract Euros CalculatePriceCore();
+
+
+        public abstract ExpirationDate GetExpirationDate();
+    }
+
+    public class TwoDaysMovie : Movie
+    {
+        protected override Euros CalculatePriceCore()
         {
+            return Euros.Of(4);
+        }
 
-            ExpirationDate result;
+        public override ExpirationDate GetExpirationDate()
+        {
+            return (ExpirationDate)DateTime.UtcNow.AddDays(2);
+        }
+    }
 
-            switch (this.LicensingModel)
-            {
-                case LicensingModel.TwoDays:
-                    result = (ExpirationDate)DateTime.UtcNow.AddDays(2);
-                    break;
+    public class LongLivedMovie : Movie
+    {
+        protected override Euros CalculatePriceCore()
+        {
+            return Euros.Of(8);
+        }
 
-                case LicensingModel.LifeLong:
-                    result = ExpirationDate.Infinite;
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            return result;
-
+        public override ExpirationDate GetExpirationDate()
+        {
+            return ExpirationDate.Infinite;
         }
     }
 }
