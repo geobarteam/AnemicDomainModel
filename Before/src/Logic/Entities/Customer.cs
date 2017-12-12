@@ -60,5 +60,27 @@ namespace Logic.Entities
             var purchasedMovie = new PurchasedMovie(this, movie, price, expirationDate);
             this._purchasedMovies.Add(purchasedMovie);
         }
+
+        public virtual bool Promote()
+        {
+            // at least 2 active movies during the last 30 days
+            if (this.PurchasedMovies.Count(x => x.ExpirationDate == ExpirationDate.Infinite || x.ExpirationDate.Date >= DateTime.UtcNow.AddDays(-30)) < 2)
+                return false;
+
+            // at least 100 dollars spent during the last year
+            if (this.PurchasedMovies.Where(x => x.PurchaseDate > DateTime.UtcNow.AddYears(-1)).Sum(x => x.Price) < 100m)
+                return false;
+
+            this.Status = this.Status.Promote();
+
+            return true;
+        }
+
+        public virtual void PurchaseMovie(Movie movie)
+        {
+            var price = movie.CalculatePrice(this.Status);
+            this.AddPurchasedMovies(movie, movie.GetExpirationDate(), price);
+
+        }
     }
 }

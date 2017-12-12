@@ -38,6 +38,8 @@ namespace Logic.Entities
             return this.Type.GetHashCode() ^ this.ExpirationDate.GetHashCode();
         }
 
+        public decimal GetDiscount() => IsAdvanced ? 0.25m : 0m;
+
         public CustomerStatus Promote()
         {
             this.Type = CustomerStatusType.Advanced;

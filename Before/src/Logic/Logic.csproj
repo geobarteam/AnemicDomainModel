@@ -76,8 +76,6 @@
     <Compile Include="Repositories\CustomerRepository.cs" />
     <Compile Include="Repositories\MovieRepository.cs" />
     <Compile Include="Repositories\Repository.cs" />
-    <Compile Include="Services\CustomerService.cs" />
-    <Compile Include="Services\MovieService.cs" />
     <Compile Include="Utils\Result.cs" />
     <Compile Include="Utils\SessionFactory.cs" />
     <Compile Include="Utils\UnitOfWork.cs" />
@@ -86,6 +84,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
