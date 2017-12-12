@@ -158,16 +158,13 @@ namespace Api.Controllers
                     return Error("Invalid customer id: " + id);
                 }
 
-                if (customer.Status.IsAdvanced)
+                var success = customer.CanPromote();
+                if (success.IsFailure)
                 {
-                    return Error("The customer already has the Advanced status");
+                    return Error(success.Error);
                 }
-
-                bool success = customer.Promote();
-                if (!success)
-                {
-                    return Error("Cannot promote the customer");
-                }
+                
+                customer.Promote();
 
                 return Ok();
             

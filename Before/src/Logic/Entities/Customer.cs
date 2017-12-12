@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Logic.Utils;
 using Remotion.Linq.Utilities;
 
 namespace Logic.Entities
@@ -61,19 +62,31 @@ namespace Logic.Entities
             this._purchasedMovies.Add(purchasedMovie);
         }
 
-        public virtual bool Promote()
+        public virtual Result CanPromote()
         {
+            if (this.Status.IsAdvanced)
+            {
+                return Result.Fail("The customer already has the Advanced status");
+            }
             // at least 2 active movies during the last 30 days
             if (this.PurchasedMovies.Count(x => x.ExpirationDate == ExpirationDate.Infinite || x.ExpirationDate.Date >= DateTime.UtcNow.AddDays(-30)) < 2)
-                return false;
+                return Result.Fail("Customer has not 2 active movies the last 30 days");
 
             // at least 100 dollars spent during the last year
             if (this.PurchasedMovies.Where(x => x.PurchaseDate > DateTime.UtcNow.AddYears(-1)).Sum(x => x.Price) < 100m)
-                return false;
+                return Result.Fail("Customer has not spent at least 100 dollars during the last year");
+
+            return Result.Ok();
+        }
+
+        public virtual void Promote()
+        {
+            if (CanPromote().IsFailure)
+            {
+                throw new Exception();
+            }
 
             this.Status = this.Status.Promote();
-
-            return true;
         }
 
         public virtual void PurchaseMovie(Movie movie)
